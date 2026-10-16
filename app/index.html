@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>DataPilot</title>
+    <link rel="stylesheet" href="/assets/style.css" />
+  </head>
+  <body>
+    <header>
+      <small>Tabular data profiling · v0.2.0</small>
+      <h1>DataPilot</h1>
+      <p>
+        Turn a CSV into a transparent data-quality report with numeric
+        summaries, correlations and outlier rows.
+      </p>
+      <a href="/guide">User guide</a> · <a href="/docs">API reference</a>
+    </header>
+    <main>
+      <div id="status" class="status" role="status" aria-live="polite">
+        Ready. Sample buttons load synthetic data; nothing runs automatically.
+      </div>
+      <div class="layout">
+        <section class="panel">
+          <h2>Load a table</h2>
+          <label
+            >CSV or JSON file<input
+              id="import"
+              type="file"
+              accept=".csv,.json,text/csv,application/json" /></label
+          ><label class="check"
+            ><input id="infer" type="checkbox" checked />Infer CSV numbers,
+            booleans and empty cells</label
+          >
+          <p class="hint">
+            Leading-zero identifiers stay text. Empty cells become null. Disable
+            inference to preserve all CSV text.
+          </p>
+          <label
+            >Paste CSV<textarea
+              id="csv"
+              placeholder="region,revenue,cost&#10;North,120,80&#10;South,150,90"
+            ></textarea>
+          </label>
+          <div class="actions">
+            <button id="load-csv">Preview pasted CSV</button
+            ><button id="sample">Load synthetic sales table</button>
+          </div>
+          <div id="preview" class="empty">
+            Import or paste a table to preview it.
+          </div>
+          <div class="actions">
+            <button id="run" class="primary">Profile this table</button
+            ><button id="export-input">Export input JSON</button
+            ><button id="export-report">Export full report</button
+            ><button id="export-csv">Export column summary CSV</button>
+          </div>
+          <p class="hint">
+            Up to 5,000 rows and 50 columns. Numeric magnitudes must be at most
+            1e100. Files over 2 MiB are rejected.
+          </p>
+        </section>
+        <section class="panel">
+          <h2>Data quality overview</h2>
+          <div id="overview" class="empty">
+            Run profiling after loading a table.
+          </div>
+        </section>
+        <section class="panel wide">
+          <h2>Column statistics and relationships</h2>
+          <div id="results" class="empty">
+            Numeric summaries, pairwise correlations and outlier row details
+            will appear here.
+          </div>
+        </section>
+      </div>
+      <footer>
+        CPU-first · no external assets · inputs are sent to this app server when
+        analyzed · no automatic persistence. Treat reports as exploratory
+        evidence.
+      </footer>
+    </main>
+    <script type="module" src="/assets/ui.mjs"></script>
+  </body>
+</html>
