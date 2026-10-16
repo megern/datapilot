@@ -1,0 +1,62 @@
+{
+  "synthetic": true,
+  "http_status": 200,
+  "invalid_input_status": 422,
+  "latency_ms": [
+    3.501167055219412,
+    3.2480829395353794,
+    3.780375001952052
+  ],
+  "result": {
+    "row_count": 5,
+    "columns": {
+      "x": {
+        "missing_count": 1,
+        "present_count": 4,
+        "numeric_count": 4,
+        "type": "numeric",
+        "mean": 26.5,
+        "median": 2.5,
+        "stddev_sample": 49.00680224893955,
+        "min": 1.0,
+        "max": 100.0,
+        "q1": 1.75,
+        "q3": 27.25,
+        "outlier_row_indices": [
+          4
+        ]
+      },
+      "y": {
+        "missing_count": 0,
+        "present_count": 5,
+        "numeric_count": 5,
+        "type": "numeric",
+        "mean": 44.0,
+        "median": 6.0,
+        "stddev_sample": 87.23531395025755,
+        "min": 2.0,
+        "max": 200.0,
+        "q1": 4.0,
+        "q3": 8.0,
+        "outlier_row_indices": [
+          4
+        ]
+      }
+    },
+    "correlations": [
+      {
+        "columns": [
+          "x",
+          "y"
+        ],
+        "pearson_r": 0.9999999999999999,
+        "paired_rows": 4
+      }
+    ],
+    "limitations": [
+      "Numeric strings are categorical; booleans are not numbers.",
+      "Correlations use pairwise complete rows and do not imply causation.",
+      "IQR outliers are exploratory flags, not errors. Row indices are zero-based."
+    ]
+  }
+}
