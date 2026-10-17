@@ -4,7 +4,7 @@ from fastapi.responses import HTMLResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
 from .core import ProfileRequest, analyze
 
-app = FastAPI(title="DataPilot", version="0.2.0")
+app = FastAPI(title="DataPilot", version="0.3.0")
 
 
 @app.get("/health")

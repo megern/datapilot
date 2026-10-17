@@ -231,3 +231,61 @@ test("CSV ignores only blank physical lines and counts empty records toward row 
   assert.equal(parseCSV("x,y\n" + ",\n".repeat(5000)).length, 5000);
   assert.throws(() => parseCSV("x,y\n" + ",\n".repeat(5001)), /5000/);
 });
+
+test("Data quality UI shows typed frequencies and bounded duplicate detail", async () => {
+  const { readFile: readLocal } = await import("node:fs/promises");
+  const { documentFromHTML } = await import("./ui-test-dom.mjs");
+  globalThis.document = documentFromHTML(
+    await readLocal(new URL("../app/index.html", import.meta.url), "utf8")
+  );
+  await import("../app/static/ui.mjs?feature=data-quality");
+  document.getElementById("sample").onclick();
+  const originalFetch = globalThis.fetch;
+  // Synthetic protocol fixture exercises rendering; duplicate/frequency math is covered by API tests.
+  const column = {
+    type: "mixed_or_categorical",
+    missing_count: 1,
+    present_count: 2,
+    numeric_count: 0,
+    absent_count: 0,
+    null_count: 1,
+    unique_present_count: 1,
+    unique_fraction: 0.5,
+    top_values: [
+      {
+        type: "string",
+        value: "<img onerror=alert(1)>",
+        count: 2,
+        value_truncated: false
+      }
+    ],
+    top_values_truncated: false
+  };
+  globalThis.fetch = async () => ({
+    ok: true,
+    json: async () => ({
+      row_count: 3,
+      columns: { region: column },
+      correlations: [],
+      duplicates: {
+        group_count: 1,
+        rows_in_duplicate_groups: 2,
+        redundant_row_count: 1,
+        groups: [{ count: 2, row_indices: [0, 1], indices_truncated: false }],
+        groups_truncated: false
+      },
+      limitations: []
+    })
+  });
+  try {
+    await document.getElementById("run").onclick();
+    const text = document.getElementById("results").textContent;
+    assert.match(text, /Uniqueness and frequent values/);
+    assert.match(text, /Redundant rows/);
+    assert.match(text, /string: "<img onerror=alert\(1\)>" × 2/);
+    assert.equal(document.querySelectorAll("img").length, 0);
+  } finally {
+    globalThis.fetch = originalFetch;
+    delete globalThis.document;
+  }
+});
