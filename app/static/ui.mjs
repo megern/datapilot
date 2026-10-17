@@ -162,6 +162,70 @@ function render(r, request) {
       ];
     })
   );
+  root.append(el("h3", "Uniqueness and frequent values"));
+  table(
+    root,
+    [
+      "Column",
+      "Absent keys",
+      "Explicit nulls",
+      "Unique nonmissing values",
+      "Unique fraction",
+      "Top values (typed, count)"
+    ],
+    names.map((name) => {
+      const column = r.columns[name];
+      return [
+        name,
+        column.absent_count,
+        column.null_count,
+        column.unique_present_count,
+        percent(column.unique_fraction),
+        column.top_values
+          .map(
+            (entry) =>
+              `${entry.type}: ${JSON.stringify(entry.value)}${entry.value_truncated ? "… [truncated]" : ""} × ${entry.count}`
+          )
+          .join("\n") +
+          (column.top_values_truncated
+            ? "\n[More distinct values not shown]"
+            : "")
+      ];
+    })
+  );
+  root.append(el("h3", "Exact duplicate rows"));
+  const duplicateMetrics = el("div", undefined, "metrics");
+  metric(duplicateMetrics, "Duplicate groups", r.duplicates.group_count);
+  metric(
+    duplicateMetrics,
+    "Rows in those groups",
+    r.duplicates.rows_in_duplicate_groups
+  );
+  metric(
+    duplicateMetrics,
+    "Redundant rows",
+    r.duplicates.redundant_row_count,
+    "Rows beyond the first in each group"
+  );
+  root.append(duplicateMetrics);
+  table(
+    root,
+    ["Group", "Total rows", "Zero-based row indices"],
+    r.duplicates.groups.map((group, index) => [
+      index + 1,
+      group.count,
+      group.row_indices.join(", ") +
+        (group.indices_truncated ? " … [truncated]" : "")
+    ])
+  );
+  if (r.duplicates.groups_truncated)
+    root.append(
+      el(
+        "p",
+        "Only the first 100 duplicate groups are shown; summary counts include all groups.",
+        "notice"
+      )
+    );
   root.append(el("h3", "Pairwise Pearson correlations"));
   if (r.correlations.length)
     table(

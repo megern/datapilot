@@ -1,0 +1,140 @@
+{
+  "synthetic": true,
+  "http_status": 200,
+  "invalid_input_status": 422,
+  "latency_ms": [
+    4.539416870102286,
+    2.6242921594530344,
+    4.787791986018419
+  ],
+  "result": {
+    "row_count": 5,
+    "columns": {
+      "x": {
+        "absent_count": 0,
+        "null_count": 1,
+        "unique_present_count": 4,
+        "unique_fraction": 1.0,
+        "top_values": [
+          {
+            "type": "number",
+            "value": 1,
+            "count": 1,
+            "value_truncated": false
+          },
+          {
+            "type": "number",
+            "value": 2,
+            "count": 1,
+            "value_truncated": false
+          },
+          {
+            "type": "number",
+            "value": 3,
+            "count": 1,
+            "value_truncated": false
+          },
+          {
+            "type": "number",
+            "value": 100,
+            "count": 1,
+            "value_truncated": false
+          }
+        ],
+        "top_values_truncated": false,
+        "missing_count": 1,
+        "present_count": 4,
+        "numeric_count": 4,
+        "type": "numeric",
+        "mean": 26.5,
+        "median": 2.5,
+        "stddev_sample": 49.00680224893955,
+        "min": 1.0,
+        "max": 100.0,
+        "q1": 1.75,
+        "q3": 27.25,
+        "outlier_row_indices": [
+          4
+        ]
+      },
+      "y": {
+        "absent_count": 0,
+        "null_count": 0,
+        "unique_present_count": 5,
+        "unique_fraction": 1.0,
+        "top_values": [
+          {
+            "type": "number",
+            "value": 2,
+            "count": 1,
+            "value_truncated": false
+          },
+          {
+            "type": "number",
+            "value": 4,
+            "count": 1,
+            "value_truncated": false
+          },
+          {
+            "type": "number",
+            "value": 6,
+            "count": 1,
+            "value_truncated": false
+          },
+          {
+            "type": "number",
+            "value": 8,
+            "count": 1,
+            "value_truncated": false
+          },
+          {
+            "type": "number",
+            "value": 200,
+            "count": 1,
+            "value_truncated": false
+          }
+        ],
+        "top_values_truncated": false,
+        "missing_count": 0,
+        "present_count": 5,
+        "numeric_count": 5,
+        "type": "numeric",
+        "mean": 44.0,
+        "median": 6.0,
+        "stddev_sample": 87.23531395025755,
+        "min": 2.0,
+        "max": 200.0,
+        "q1": 4.0,
+        "q3": 8.0,
+        "outlier_row_indices": [
+          4
+        ]
+      }
+    },
+    "duplicates": {
+      "group_count": 0,
+      "rows_in_duplicate_groups": 0,
+      "redundant_row_count": 0,
+      "groups": [],
+      "groups_truncated": false
+    },
+    "correlations": [
+      {
+        "columns": [
+          "x",
+          "y"
+        ],
+        "pearson_r": 1.0,
+        "paired_rows": 4
+      }
+    ],
+    "limitations": [
+      "Numeric strings are categorical; booleans are not numbers.",
+      "Duplicate rows use typed values; bool, number and string are distinct. Numeric 1 and 1.0 are equivalent; absent keys differ from explicit null.",
+      "Uniqueness excludes absent/null cells. Top values show at most 10 entries, strings capped at 120 characters; counts remain exact.",
+      "Duplicate detail is capped at 100 groups and 100 indices per group; summary counts remain exact.",
+      "Correlations use pairwise complete rows and do not imply causation.",
+      "IQR outliers are exploratory flags, not errors. Row indices are zero-based."
+    ]
+  }
+}

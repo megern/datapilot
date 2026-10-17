@@ -1,0 +1,9 @@
+2026-10-17T02:33:59Z	INFO	[vulndb] Need to update DB
+2026-10-17T02:33:59Z	INFO	[vulndb] Downloading vulnerability DB...
+2026-10-17T02:33:59Z	INFO	[vulndb] Downloading artifact...	repo="ghcr.io/aquasecurity/trivy-db:2"
+2026-10-17T02:34:44Z	INFO	[vulndb] Artifact successfully downloaded	repo="ghcr.io/aquasecurity/trivy-db:2"
+2026-10-17T02:34:44Z	INFO	[vuln] Vulnerability scanning is enabled
+2026-10-17T02:34:44Z	INFO	Detected OS	family="alpine" version="3.24.2"
+2026-10-17T02:34:44Z	INFO	[alpine] Detecting vulnerabilities...	os_version="3.24" repository="3.24" pkg_num=38
+2026-10-17T02:34:44Z	INFO	Number of language-specific files	num=1
+2026-10-17T02:34:44Z	INFO	[python-pkg] Detecting vulnerabilities...

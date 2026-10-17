@@ -1,3 +1,4 @@
+from collections import Counter
 import math
 import statistics
 from pydantic import BaseModel, Field, model_validator
@@ -38,6 +39,38 @@ def quantile(xs, p):
     return xs[lo] + (xs[hi] - xs[lo]) * (i - lo)
 
 
+def typed_key(value):
+    if value is None:
+        return ("null",)
+    if isinstance(value, bool):
+        return ("boolean", value)
+    if isinstance(value, (int, float)):
+        return ("number", value)
+    return ("string", value)
+
+
+def duplicate_summary(rows):
+    groups = {}
+    for index, row in enumerate(rows):
+        key = tuple((name, typed_key(value)) for name, value in sorted(row.items()))
+        groups.setdefault(key, []).append(index)
+    duplicates = [indices for indices in groups.values() if len(indices) > 1]
+    return {
+        "group_count": len(duplicates),
+        "rows_in_duplicate_groups": sum(len(indices) for indices in duplicates),
+        "redundant_row_count": sum(len(indices) - 1 for indices in duplicates),
+        "groups": [
+            {
+                "count": len(indices),
+                "row_indices": indices[:100],
+                "indices_truncated": len(indices) > 100,
+            }
+            for indices in duplicates[:100]
+        ],
+        "groups_truncated": len(duplicates) > 100,
+    }
+
+
 def analyze(req: ProfileRequest):
     columns = sorted({k for row in req.rows for k in row})
     profiles = {}
@@ -47,7 +80,23 @@ def analyze(req: ProfileRequest):
             (i, row[col]) for i, row in enumerate(req.rows) if row.get(col) is not None
         ]
         nums = [(i, float(v)) for i, v in present if numeric(v)]
+        counts = Counter(typed_key(value) for _, value in present)
+        top_counts = counts.most_common(10)
         p = {
+            "absent_count": sum(col not in row for row in req.rows),
+            "null_count": sum(col in row and row[col] is None for row in req.rows),
+            "unique_present_count": len(counts),
+            "unique_fraction": len(counts) / len(present) if present else None,
+            "top_values": [
+                {
+                    "type": key[0],
+                    "value": str(key[1])[:120] if key[0] == "string" else key[1],
+                    "count": count,
+                    "value_truncated": key[0] == "string" and len(str(key[1])) > 120,
+                }
+                for key, count in top_counts
+            ],
+            "top_values_truncated": len(counts) > 10,
             "missing_count": len(req.rows) - len(present),
             "present_count": len(present),
             "numeric_count": len(nums),
@@ -85,24 +134,42 @@ def analyze(req: ProfileRequest):
             value = None
             if len(pairs) > 1:
                 xs, ys = zip(*pairs)
-                xm = statistics.mean(xs)
-                ym = statistics.mean(ys)
-                den = math.sqrt(sum((x - xm) ** 2 for x in xs)) * math.sqrt(
-                    sum((y - ym) ** 2 for y in ys)
-                )
-                if den:
-                    value = max(
-                        -1.0, min(1.0, sum((x - xm) * (y - ym) for x, y in pairs) / den)
+                # Scale raw values before centering so tiny representable variation is not squared away.
+                x_scale, y_scale = max(map(abs, xs)), max(map(abs, ys))
+                if x_scale and y_scale:
+                    normalized_x = [x / x_scale for x in xs]
+                    normalized_y = [y / y_scale for y in ys]
+                    xm, ym = (
+                        statistics.mean(normalized_x),
+                        statistics.mean(normalized_y),
                     )
+                    dx = [x - xm for x in normalized_x]
+                    dy = [y - ym for y in normalized_y]
+                    denominator = math.sqrt(math.fsum(x * x for x in dx)) * math.sqrt(
+                        math.fsum(y * y for y in dy)
+                    )
+                    if denominator:
+                        value = max(
+                            -1.0,
+                            min(
+                                1.0,
+                                math.fsum(x * y for x, y in zip(dx, dy)) / denominator,
+                            ),
+                        )
+
             correlations.append(
                 {"columns": [a, b], "pearson_r": value, "paired_rows": len(pairs)}
             )
     return {
         "row_count": len(req.rows),
         "columns": profiles,
+        "duplicates": duplicate_summary(req.rows),
         "correlations": correlations,
         "limitations": [
             "Numeric strings are categorical; booleans are not numbers.",
+            "Duplicate rows use typed values; bool, number and string are distinct. Numeric 1 and 1.0 are equivalent; absent keys differ from explicit null.",
+            "Uniqueness excludes absent/null cells. Top values show at most 10 entries, strings capped at 120 characters; counts remain exact.",
+            "Duplicate detail is capped at 100 groups and 100 indices per group; summary counts remain exact.",
             "Correlations use pairwise complete rows and do not imply causation.",
             "IQR outliers are exploratory flags, not errors. Row indices are zero-based.",
         ],

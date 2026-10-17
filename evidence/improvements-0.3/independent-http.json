@@ -1,0 +1,110 @@
+{
+  "application": "datapilot",
+  "reviewed_at_utc": "2026-10-17T02:36:41.361245+00:00",
+  "base_url": "http://127.0.0.1:18204",
+  "checks": [
+    {
+      "path": "/",
+      "status": 200,
+      "expected_source_sha256": "b4a6117da0f93b4e70da2ebc494aa5e10896b3642742e32468e148a6338c6728",
+      "served_sha256": "b4a6117da0f93b4e70da2ebc494aa5e10896b3642742e32468e148a6338c6728",
+      "matches": true
+    },
+    {
+      "path": "/guide",
+      "status": 200,
+      "expected_source_sha256": "f088dfcfcd61d128e7b44593087fe145e4a717fc38de896c7fcc7f5d539c73bd",
+      "served_sha256": "f088dfcfcd61d128e7b44593087fe145e4a717fc38de896c7fcc7f5d539c73bd",
+      "matches": true
+    },
+    {
+      "path": "/assets/ui.mjs",
+      "status": 200,
+      "expected_source_sha256": "c591496d9748a29366369978905e902ae4dddba5572881acc636a26824689e53",
+      "served_sha256": "c591496d9748a29366369978905e902ae4dddba5572881acc636a26824689e53",
+      "matches": true
+    },
+    {
+      "path": "/assets/common.mjs",
+      "status": 200,
+      "expected_source_sha256": "6410a7d942d231f320cf67bad5b575793d40db2c025d66d01a6eb4f5effef3a9",
+      "served_sha256": "6410a7d942d231f320cf67bad5b575793d40db2c025d66d01a6eb4f5effef3a9",
+      "matches": true
+    },
+    {
+      "path": "/assets/style.css",
+      "status": 200,
+      "expected_source_sha256": "31edaeb85459bc32652a37b11a7f5c5f716f16915fde7fe607f1ac9e3b7367c3",
+      "served_sha256": "31edaeb85459bc32652a37b11a7f5c5f716f16915fde7fe607f1ac9e3b7367c3",
+      "matches": true
+    }
+  ],
+  "source_match_scope": "Exact bytes for served index, guide and ui/common/style assets; API version and functional new-feature behavior. This does not expose or independently hash container backend Python files.",
+  "feature_probe": {
+    "probe": "typed duplicates plus repaired valid tiny-scale correlation",
+    "duplicates": {
+      "group_count": 2,
+      "rows_in_duplicate_groups": 4,
+      "redundant_row_count": 2,
+      "groups": [
+        {
+          "count": 2,
+          "row_indices": [
+            1,
+            3
+          ],
+          "indices_truncated": false
+        },
+        {
+          "count": 2,
+          "row_indices": [
+            4,
+            6
+          ],
+          "indices_truncated": false
+        }
+      ],
+      "groups_truncated": false
+    },
+    "column": {
+      "absent_count": 2,
+      "null_count": 1,
+      "unique_present_count": 3,
+      "unique_fraction": 0.75,
+      "top_values": [
+        {
+          "type": "number",
+          "value": 1,
+          "count": 2,
+          "value_truncated": false
+        },
+        {
+          "type": "boolean",
+          "value": true,
+          "count": 1,
+          "value_truncated": false
+        },
+        {
+          "type": "string",
+          "value": "1",
+          "count": 1,
+          "value_truncated": false
+        }
+      ],
+      "top_values_truncated": false,
+      "missing_count": 3,
+      "present_count": 4,
+      "numeric_count": 2,
+      "type": "mixed_or_categorical"
+    },
+    "tiny_correlation": {
+      "columns": [
+        "x",
+        "y"
+      ],
+      "pearson_r": 0.9999999999999998,
+      "paired_rows": 5
+    }
+  },
+  "status": "PASS"
+}

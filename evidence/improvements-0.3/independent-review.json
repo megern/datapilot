@@ -1,0 +1,217 @@
+{
+  "application": "datapilot",
+  "version": "0.3.0",
+  "reviewed_at_utc": "2026-10-17T02:36:41.420139+00:00",
+  "reviewer": "Independent AI scientific/security/QA reviewer build_science, different from this application author; no human audit claimed",
+  "production_modified_by_reviewer": false,
+  "status": "ACCEPT_LOCAL_SCOPE",
+  "confidence": "moderate for bounded documented local research scope",
+  "issues": [
+    {
+      "id": "DATA-03-01",
+      "severity": "P2",
+      "status": "resolved",
+      "summary": "Nonconstant perfectly correlated valid small-scale numeric columns produce null Pearson correlation due squared-deviation underflow.",
+      "reproduction": "tests/test_independent03.py::test_independent_small_scale_perfect_correlation_remains_defined supplies x=i*1e-200 and y=2*x for i=-2,-1,0,1,2 through the actual FastAPI endpoint.",
+      "expected": "pearson_r approximately1 with paired_rows=5.",
+      "actual": "pearson_r null",
+      "production_location": "app/core.py correlation denominator using sums of squared unscaled deviations",
+      "resolution": "Author now scales raw numeric columns before centering, then uses fsum normalized products; independent tiny-scale perfect-correlation regression and authored minimum-subnormal case pass."
+    }
+  ],
+  "scientific_assessment": "Independent mixed bool/number/string identity, absent versus null, numeric1/1.0 equivalence and long shared-prefix value cases verify exact duplicate/uniqueness/frequency counts despite bounded display. An earlier valid-input correlation underflow defect was found and repaired, as recorded in review history. Tiny-scale correlation defect repaired and independently verified through both in-process and deployed localhost HTTP requests.",
+  "residual_limits": [
+    "IQR flags are descriptive; duplicate rows may be legitimate events and are not automatically removed. Pairwise correlations are not causal evidence.",
+    "Numeric summaries convert values to binary64; extreme offsets can lose small differences. Integer/category identity retains typed values independently of numeric-summary rounding.",
+    "UI source uses Object.fromEntries for imported keys, inert textContent, formula-neutralized CSV export and revision guards; interactive verification is a separate root gate."
+  ],
+  "checks": [
+    {
+      "name": "independent-pytest-final",
+      "exit_code": 0,
+      "evidence": "evidence/improvements-0.3/independent-pytest-final.txt"
+    },
+    {
+      "name": "independent-frontend-final",
+      "exit_code": 0,
+      "evidence": "evidence/improvements-0.3/independent-frontend-final.txt"
+    },
+    {
+      "name": "independent-bandit-final",
+      "exit_code": 0,
+      "evidence": "evidence/improvements-0.3/independent-bandit-final.txt"
+    }
+  ],
+  "source_hashes_sha256": [
+    {
+      "sha256": "e74496d32026daa50450156b4630fe9966d2580a07455399763a9ae450a5b864",
+      "path": ".github/workflows/ci.yml"
+    },
+    {
+      "sha256": "11e7bdd058b64cd74b6fe90a9687e6a9e4a5644139e2c5bdc4d27e7e1051b944",
+      "path": "Dockerfile"
+    },
+    {
+      "sha256": "0bb2b267d7bb31bcf6a874377082f21ceca8733130ebf428ab0206e740d9c10d",
+      "path": "README.md"
+    },
+    {
+      "sha256": "f088dfcfcd61d128e7b44593087fe145e4a717fc38de896c7fcc7f5d539c73bd",
+      "path": "app/USER_GUIDE.md"
+    },
+    {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "path": "app/__init__.py"
+    },
+    {
+      "sha256": "d44fb183f02932dd76e6ac6b34968709c4c0151562f46bfc7972babd4d930af5",
+      "path": "app/core.py"
+    },
+    {
+      "sha256": "d1eda2150e58503114c6cf4ba36d5958aa7e2cfbb496fc0d8026b5c9da4beb77",
+      "path": "app/guard.py"
+    },
+    {
+      "sha256": "b4a6117da0f93b4e70da2ebc494aa5e10896b3642742e32468e148a6338c6728",
+      "path": "app/index.html"
+    },
+    {
+      "sha256": "0e757a647c0f366d5e7e64862b570d0b7fa054d6eadcf94e7488546df6c83f48",
+      "path": "app/main.py"
+    },
+    {
+      "sha256": "6410a7d942d231f320cf67bad5b575793d40db2c025d66d01a6eb4f5effef3a9",
+      "path": "app/static/common.mjs"
+    },
+    {
+      "sha256": "31edaeb85459bc32652a37b11a7f5c5f716f16915fde7fe607f1ac9e3b7367c3",
+      "path": "app/static/style.css"
+    },
+    {
+      "sha256": "c591496d9748a29366369978905e902ae4dddba5572881acc636a26824689e53",
+      "path": "app/static/ui.mjs"
+    },
+    {
+      "sha256": "908db17023fde21d48829b52e9540899cfda4e230c935a744cda2899f400e0a4",
+      "path": "compose.yaml"
+    },
+    {
+      "sha256": "f088dfcfcd61d128e7b44593087fe145e4a717fc38de896c7fcc7f5d539c73bd",
+      "path": "docs/USER_GUIDE.md"
+    },
+    {
+      "sha256": "c4fcb6a6c3d08c9911ffea33532729d82fc000c2d999fb6616c6e3885eb7873b",
+      "path": "pyproject.toml"
+    },
+    {
+      "sha256": "4e030cebd3834809ad8e01e16633198a5d1b9c89f2ce583241751a8327285f55",
+      "path": "requirements-dev.lock"
+    },
+    {
+      "sha256": "cc2d915f3530f2b16ab605d633b94e6c8784ee70f799daf639dd30deef2361de",
+      "path": "requirements-dev.txt"
+    },
+    {
+      "sha256": "da44951925ae485ff2ba743af929b11e7b0bac5b631084de18e1324b723d6f4d",
+      "path": "requirements.lock"
+    },
+    {
+      "sha256": "bd62df965af87f46d7903a4c86d2e43d7622bbcb6145a04466e29dc6c0e0c22b",
+      "path": "requirements.txt"
+    },
+    {
+      "sha256": "a8fcb2bef9bb7223767b555c5c54bce3281228bcbb33ab2438d972734f0f8973",
+      "path": "tests/test_api.py"
+    },
+    {
+      "sha256": "bb3e540cfe33002bce315bc5c49569dab6cfb958c276d99bf3d6443e526f4279",
+      "path": "tests/test_core.py"
+    },
+    {
+      "sha256": "36cb1928903b01e4cd36bbf33e8166a34bde9b1ec1996830295caef23f9916a2",
+      "path": "tests/test_guard_review.py"
+    },
+    {
+      "sha256": "1ddd476d29dd9c6e6407895bdc08c67e69d3dfe81c2cf0ad4fdeed8160111156",
+      "path": "tests/test_improvements_03.py"
+    },
+    {
+      "sha256": "26e2e428c088ff7a2fbba17bdd57555fb633202d5047551de17aa4886b821dec",
+      "path": "tests/test_independent03.py"
+    },
+    {
+      "sha256": "29acf3115d6a6576e4623231658668254c3633666ef3660b206cf2f5587d7780",
+      "path": "tests/test_input_limits.py"
+    },
+    {
+      "sha256": "00e3209f03f384ef5dd8bad45a7a2e281c0ef24a57daabff52d92b3bc46ac787",
+      "path": "tests/test_rebuild_interface.py"
+    },
+    {
+      "sha256": "ba2e7df72c67212982101544ec50f21f56cbbf2785c38abfc1c7ba2bf0e87da6",
+      "path": "tests/test_review.py"
+    },
+    {
+      "sha256": "ecedd0d5c9208a193cea960d43f084b49acd0a0dcd20e709cb2c755675769fd3",
+      "path": "tools/smoke.py"
+    },
+    {
+      "sha256": "63ed3f36030c92f785eb31f2afbf62c808f43d87df84b924ff55a33c8be1ab46",
+      "path": "tools/test_ui.mjs"
+    },
+    {
+      "sha256": "7a69da2c87b8670c5f68cdec85fa2ce7a58e0b7700b5e681f151d53f826fbd6e",
+      "path": "tools/ui-test-dom.mjs"
+    }
+  ],
+  "source_stable_during_checks": true,
+  "source_bundle_sha256": "1abf68b82f4b5ffc60cd2c543d7b7d56a1998f9b703c335acaeccb22f9b67eb8",
+  "release_gates_not_claimed": [
+    "interactive browser review",
+    "dependency/secret audit",
+    "remote CI",
+    "GitHub publication",
+    "independent container backend-file hash inspection"
+  ],
+  "review_history": [
+    {
+      "reviewed_at_utc": "2026-10-16T22:31:06.267153+00:00",
+      "status": "REQUIRES_FIX",
+      "issues": [
+        {
+          "id": "DATA-03-01",
+          "severity": "P2",
+          "status": "open",
+          "summary": "Nonconstant perfectly correlated valid small-scale numeric columns produce null Pearson correlation due squared-deviation underflow.",
+          "reproduction": "tests/test_independent03.py::test_independent_small_scale_perfect_correlation_remains_defined supplies x=i*1e-200 and y=2*x for i=-2,-1,0,1,2 through the actual FastAPI endpoint.",
+          "expected": "pearson_r approximately1 with paired_rows=5.",
+          "actual": "pearson_r null",
+          "production_location": "app/core.py correlation denominator using sums of squared unscaled deviations"
+        }
+      ],
+      "checks": [
+        {
+          "name": "independent-pytest",
+          "exit_code": 1,
+          "evidence": "evidence/improvements-0.3/independent-pytest.txt"
+        },
+        {
+          "name": "independent-frontend",
+          "exit_code": 0,
+          "evidence": "evidence/improvements-0.3/independent-frontend.txt"
+        },
+        {
+          "name": "independent-bandit",
+          "exit_code": 0,
+          "evidence": "evidence/improvements-0.3/independent-bandit.txt"
+        }
+      ],
+      "source_bundle_sha256": "9aa670952e80dbf4bd31bb248e7dc7831f0d38f9a31d14a259b63a28d6d57467"
+    }
+  ],
+  "runtime_review": {
+    "status": "PASS",
+    "evidence": "evidence/improvements-0.3/independent-http.json"
+  },
+  "source_hashes_encoding": "Ordered records with sha256 before path; all per-file hashes unchanged. source_bundle_sha256 remains the SHA256 of canonical JSON path-to-hash mapping with sorted keys used at review time."
+}
