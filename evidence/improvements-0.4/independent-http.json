@@ -1,0 +1,110 @@
+{
+  "at_utc": "2026-10-22T17:54:13.176640+00:00",
+  "base_url": "http://127.0.0.1:18404",
+  "source_match_scope": "Exact served index, guide, every static asset, OpenAPI version and functional feature requests. Does not hash private container backend files.",
+  "checks": [
+    {
+      "path": "/",
+      "matches_current_source": true,
+      "sha256": "42363e17cb8e80a239867fbf5076366d4264d337366e70c1bca64b1da0ef93df"
+    },
+    {
+      "path": "/guide",
+      "matches_current_source": true,
+      "sha256": "e391fce1aedfbc3fd97edbcaed451244c2f00ff0366aba80c2ef9246a38ff11c"
+    },
+    {
+      "path": "/assets/access.js",
+      "matches_current_source": true,
+      "sha256": "f7a4a09a26b83052edc956cf886195c0f4687b0661a166320f460f3e3ccad0d5"
+    },
+    {
+      "path": "/assets/common.mjs",
+      "matches_current_source": true,
+      "sha256": "29e972fbfca1660ede9ac6681e6a978446fbdec6b1956d77eeda45797c774865"
+    },
+    {
+      "path": "/assets/style.css",
+      "matches_current_source": true,
+      "sha256": "31edaeb85459bc32652a37b11a7f5c5f716f16915fde7fe607f1ac9e3b7367c3"
+    },
+    {
+      "path": "/assets/ui.mjs",
+      "matches_current_source": true,
+      "sha256": "68f7d34804aa11066079c143940ed593231c357d5dfcfacedefdee43d5fa6ed9"
+    }
+  ],
+  "feature": {
+    "probe": "global missing threshold and typed numeric duplicates with bounded detail",
+    "response": {
+      "contract_name": "table-contract",
+      "row_count": 4,
+      "passed": false,
+      "violations_total": 2,
+      "global_violation_count": 1,
+      "row_violation_count": 1,
+      "violating_row_count": 1,
+      "valid_row_count": 3,
+      "rule_violation_counts": {
+        "MISSING_FRACTION_EXCEEDED": 1,
+        "NOT_UNIQUE": 1
+      },
+      "columns": {
+        "x": {
+          "missing_count": 2,
+          "absent_count": 1,
+          "null_count": 1,
+          "missing_fraction": 0.5,
+          "violation_count": 2
+        }
+      },
+      "violations": [
+        {
+          "code": "NOT_UNIQUE",
+          "column": "x",
+          "row_index": 3,
+          "value_preview": "1.0",
+          "value_truncated": false,
+          "first_row_index": 2
+        }
+      ],
+      "detail_limit": 1,
+      "details_truncated": true,
+      "limitations": [
+        "No type coercion or data mutation. Missing means absent keys or explicit null; blank strings are present values.",
+        "Required controls key presence; nullable controls explicit null. Optional absent keys are allowed unless max_missing_fraction is exceeded.",
+        "Range/allowed values apply to correctly typed, non-null cells. Unique checks all present non-null values using typed identity; numeric 1 and 1.0 are equivalent.",
+        "Global missing-fraction failures can fail the contract even when every row satisfies its per-row rules. Violation totals count rule failures, not unique rows.",
+        "Only violation detail is truncated. Counts cover the full supplied table; this is not a statistical or regulatory certification."
+      ]
+    }
+  },
+  "status": "PASS",
+  "backend_freshness": {
+    "status": "PASS",
+    "root_proof_path": "outputs/evidence/improvements-0.4/runtime-source.json",
+    "root_proof_sha256": "e5392418dda519a74650eb84e06dd5fca9114b5cfb7b5ed4a8f1b719ba91d3b8",
+    "container": "341caa5def2c8fe2a3bc273fd9de93c579ea6a2e83dd435d270213249fe42d75",
+    "application_files_verified": 13,
+    "complete_app_tree_matches": true,
+    "image_id": "sha256:05818c1854fe6bca51eb7921c85672ba81f571bc6e9a9aaee82cdda79a90551c",
+    "native_health": "healthy",
+    "root_docker_validated_at_utc": "2026-10-22T17:39:23.693744+00:00",
+    "independently_verified_at_utc": "2026-10-22T17:54:17.195978+00:00",
+    "attribution": "Root collected private container bytes and native Docker-health evidence. Independent reviewer compared the full app mapping against current files, matched container/image identity and checked fresh actual HTTP/public bytes; private bytes were not collected by this reviewer."
+  },
+  "root_backend_source_proof": {
+    "status": "PASS",
+    "root_proof_path": "outputs/evidence/improvements-0.4/runtime-source.json",
+    "root_proof_sha256": "e5392418dda519a74650eb84e06dd5fca9114b5cfb7b5ed4a8f1b719ba91d3b8",
+    "container": "341caa5def2c8fe2a3bc273fd9de93c579ea6a2e83dd435d270213249fe42d75",
+    "application_files_verified": 13,
+    "complete_app_tree_matches": true,
+    "image_id": "sha256:05818c1854fe6bca51eb7921c85672ba81f571bc6e9a9aaee82cdda79a90551c",
+    "native_health": "healthy",
+    "root_docker_validated_at_utc": "2026-10-22T17:39:23.693744+00:00",
+    "independently_verified_at_utc": "2026-10-22T17:54:17.195978+00:00",
+    "attribution": "Root collected private container bytes and native Docker-health evidence. Independent reviewer compared the full app mapping against current files, matched container/image identity and checked fresh actual HTTP/public bytes; private bytes were not collected by this reviewer."
+  },
+  "served_bytes_match_current_source": true
+}

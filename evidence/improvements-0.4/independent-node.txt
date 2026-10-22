@@ -1,0 +1,95 @@
+TAP version 13
+# Subtest: CSV supports BOM, escaped quotes, embedded newlines, CRLF and empty cells
+ok 1 - CSV supports BOM, escaped quotes, embedded newlines, CRLF and empty cells
+  ---
+  duration_ms: 6.574333
+  ...
+# Subtest: CSV rejects ambiguity and reports the physical data-row position
+ok 2 - CSV rejects ambiguity and reports the physical data-row position
+  ---
+  duration_ms: 0.726042
+  ...
+# Subtest: Numeric inference preserves identifiers and rejects overflow
+ok 3 - Numeric inference preserves identifiers and rejects overflow
+  ---
+  duration_ms: 0.272958
+  ...
+# Subtest: CSV export neutralizes formula cells including whitespace prefixes; negatives stay numeric
+ok 4 - CSV export neutralizes formula cells including whitespace prefixes; negatives stay numeric
+  ---
+  duration_ms: 0.143583
+  ...
+# Subtest: Untrusted values are assigned to textContent, never interpreted as HTML
+ok 5 - Untrusted values are assigned to textContent, never interpreted as HTML
+  ---
+  duration_ms: 0.253792
+  ...
+# Subtest: File size check happens before reading and API validation paths are actionable
+ok 6 - File size check happens before reading and API validation paths are actionable
+  ---
+  duration_ms: 1.885958
+  ...
+# Subtest: Delayed actual UI file import cannot replace a newer synthetic sample
+ok 7 - Delayed actual UI file import cannot replace a newer synthetic sample
+  ---
+  duration_ms: 49.485
+  ...
+# Subtest: Late actual UI file rejection cannot replace newer status
+ok 8 - Late actual UI file rejection cannot replace newer status
+  ---
+  duration_ms: 15.413458
+  ...
+# Subtest: Actual UI accepts an unsuperseded JSON file import
+ok 9 - Actual UI accepts an unsuperseded JSON file import
+  ---
+  duration_ms: 17.995083
+  ...
+# Subtest: Delayed actual UI file import cannot replace a manual field edit
+ok 10 - Delayed actual UI file import cannot replace a manual field edit
+  ---
+  duration_ms: 35.275042
+  ...
+# Subtest: CSV preserves explicit all-empty records at the beginning and end
+ok 11 - CSV preserves explicit all-empty records at the beginning and end
+  ---
+  duration_ms: 1.051291
+  ...
+# Subtest: CSV preserves quoted empty single/multiple fields and multiline values
+ok 12 - CSV preserves quoted empty single/multiple fields and multiline values
+  ---
+  duration_ms: 0.529584
+  ...
+# Subtest: CSV ignores only blank physical lines and counts empty records toward row bounds
+ok 13 - CSV ignores only blank physical lines and counts empty records toward row bounds
+  ---
+  duration_ms: 25.991583
+  ...
+# Subtest: Data quality UI shows typed frequencies and bounded duplicate detail
+ok 14 - Data quality UI shows typed frequencies and bounded duplicate detail
+  ---
+  duration_ms: 58.091417
+  ...
+# Subtest: Contract UI submits typed reusable rules and renders row/global failures distinctly
+ok 15 - Contract UI submits typed reusable rules and renders row/global failures distinctly
+  ---
+  duration_ms: 24.2985
+  ...
+# Subtest: Contract editor rejects nonfinite numeric rule text before JSON can turn it into null
+ok 16 - Contract editor rejects nonfinite numeric rule text before JSON can turn it into null
+  ---
+  duration_ms: 19.726125
+  ...
+# Subtest: Removing an edited contract row does not depend on its previous column name
+ok 17 - Removing an edited contract row does not depend on its previous column name
+  ---
+  duration_ms: 31.13875
+  ...
+1..17
+# tests 17
+# suites 0
+# pass 17
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 475.285334

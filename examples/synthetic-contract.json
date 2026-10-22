@@ -1,0 +1,24 @@
+{
+  "name": "synthetic-sales-contract",
+  "allow_extra_columns": true,
+  "columns": {
+    "region": {
+      "type": "string",
+      "required": true,
+      "nullable": false,
+      "allowed_values": [
+        "North",
+        "South",
+        "East"
+      ]
+    },
+    "revenue": {
+      "type": "number",
+      "required": true,
+      "nullable": false,
+      "min_value": 0,
+      "max_value": 500,
+      "max_missing_fraction": 0
+    }
+  }
+}
