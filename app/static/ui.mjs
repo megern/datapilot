@@ -18,6 +18,7 @@ import {
   download
 } from "./common.mjs";
 let revision = 0;
+let contractReport = null;
 let rows = [],
   report = null,
   source = "manual input";
@@ -28,6 +29,8 @@ function input() {
 function invalidate() {
   revision++;
   report = null;
+  contractReport = null;
+  clear($("contract-results"));
   clear($("results"));
   clear($("overview"));
   $("results").append(
@@ -377,3 +380,343 @@ $("export-csv").onclick = () => {
   );
 };
 setupDownloads(input, () => report, "datapilot");
+
+function invalidateContract() {
+  revision++;
+  contractReport = null;
+  clear($("contract-results"));
+}
+function contractInput() {
+  const entries = [...document.querySelectorAll(".contract-row")].map((row) => {
+    const get = (name) => row.querySelector(".contract-" + name);
+    const name = get("column").value;
+    const rule = {
+      type: get("type").value,
+      required: get("required").checked,
+      nullable: get("nullable").checked,
+      unique: get("unique").checked
+    };
+    for (const key of ["min_value", "max_value", "max_missing_fraction"])
+      if (get(key).value !== "") {
+        const value = Number(get(key).value);
+        if (!Number.isFinite(value))
+          throw Error(key + " must be a finite number.");
+        rule[key] = value;
+      }
+    if (get("allowed_values").value.trim())
+      rule.allowed_values = JSON.parse(get("allowed_values").value);
+    return [name, rule];
+  });
+  if (
+    !entries.length ||
+    entries.length > 50 ||
+    entries.some(([name]) => !name) ||
+    new Set(entries.map(([name]) => name)).size !== entries.length
+  )
+    throw Error("Use 1–50 rules with unique nonempty column names.");
+  return {
+    name: $("contract-name").value,
+    allow_extra_columns: $("contract-extra").checked,
+    columns: Object.fromEntries(entries)
+  };
+}
+function drawContract(contract) {
+  clear($("contract-fields"));
+  for (const [name, rule] of Object.entries(contract.columns)) {
+    const row = el("div", undefined, "editor-row contract-row");
+    for (const [key, title, value] of [
+      ["column", "Column", name],
+      ["type", "Declared type", rule.type],
+      ["min_value", "Minimum numeric value", rule.min_value],
+      ["max_value", "Maximum numeric value", rule.max_value],
+      [
+        "max_missing_fraction",
+        "Maximum missing fraction (0–1)",
+        rule.max_missing_fraction
+      ],
+      [
+        "allowed_values",
+        "Allowed non-null values (JSON array, optional)",
+        rule.allowed_values === undefined
+          ? ""
+          : JSON.stringify(rule.allowed_values)
+      ]
+    ]) {
+      const label = el("label", title),
+        field = el(
+          key === "type"
+            ? "select"
+            : key === "allowed_values"
+              ? "textarea"
+              : "input"
+        );
+      field.className = "contract-" + key;
+      if (key === "type")
+        for (const kind of ["number", "string", "boolean"]) {
+          const option = el("option", kind);
+          option.value = kind;
+          field.append(option);
+        }
+      field.value = value ?? "";
+      field.oninput = invalidateContract;
+      label.append(field);
+      row.append(label);
+    }
+    for (const [key, title, value] of [
+      ["required", "Required key", rule.required ?? true],
+      ["nullable", "Allow null", rule.nullable ?? false],
+      ["unique", "Unique non-null values", rule.unique ?? false]
+    ]) {
+      const label = el("label", title, "check"),
+        field = el("input");
+      field.type = "checkbox";
+      field.className = "contract-" + key;
+      field.checked = value;
+      field.oninput = invalidateContract;
+      label.append(field);
+      row.append(label);
+    }
+    const remove = el("button", "Remove rule");
+    remove.onclick = () => {
+      const parent = $("contract-fields");
+      parent.replaceChildren(
+        ...[...parent.children].filter((child) => child !== row)
+      );
+      invalidateContract();
+    };
+    row.append(remove);
+    $("contract-fields").append(row);
+  }
+  $("contract-name").value = contract.name || "table-contract";
+  $("contract-extra").checked = contract.allow_extra_columns ?? true;
+}
+function loadContract(value) {
+  const contract = value.contract || value.input?.contract || value;
+  if (
+    !contract ||
+    typeof contract !== "object" ||
+    !contract.columns ||
+    Array.isArray(contract.columns) ||
+    typeof contract.columns !== "object"
+  )
+    throw Error("Import a contract with a columns object.");
+  if (
+    Object.keys(contract).some(
+      (key) => !["name", "columns", "allow_extra_columns"].includes(key)
+    )
+  )
+    throw Error("Unknown contract field.");
+  if (contract.name !== undefined && typeof contract.name !== "string")
+    throw Error("Contract name must be text.");
+  if (
+    contract.allow_extra_columns !== undefined &&
+    typeof contract.allow_extra_columns !== "boolean"
+  )
+    throw Error("allow_extra_columns must be boolean.");
+  const keys = Object.keys(contract.columns);
+  if (!keys.length || keys.length > 50)
+    throw Error("Contract needs 1–50 column rules.");
+  for (const rule of Object.values(contract.columns)) {
+    if (
+      !rule ||
+      !["number", "string", "boolean"].includes(rule.type) ||
+      Object.keys(rule).some(
+        (key) =>
+          ![
+            "type",
+            "required",
+            "nullable",
+            "min_value",
+            "max_value",
+            "allowed_values",
+            "unique",
+            "max_missing_fraction"
+          ].includes(key)
+      )
+    )
+      throw Error("Unknown or malformed column rule.");
+    for (const key of ["required", "nullable", "unique"])
+      if (rule[key] !== undefined && typeof rule[key] !== "boolean")
+        throw Error(key + " must be boolean.");
+  }
+  drawContract(contract);
+  invalidateContract();
+}
+for (const id of ["contract-name", "contract-extra", "contract-limit"])
+  $(id).oninput = invalidateContract;
+$("contract-generate").onclick = () => {
+  try {
+    input();
+    const columns = Object.fromEntries(
+      [...new Set(rows.flatMap((row) => Object.keys(row)))].map((name) => {
+        const value = rows.find(
+          (row) => row[name] !== null && row[name] !== undefined
+        )?.[name];
+        return [
+          name,
+          {
+            type:
+              typeof value === "number"
+                ? "number"
+                : typeof value === "boolean"
+                  ? "boolean"
+                  : "string",
+            required: true,
+            nullable: rows.some((row) => row[name] === null)
+          }
+        ];
+      })
+    );
+    loadContract({
+      name: "draft-contract",
+      allow_extra_columns: true,
+      columns
+    });
+    status(
+      "Draft inferred from first non-null values. Review every rule; this is not an approved contract."
+    );
+  } catch (error) {
+    status(error.message, true);
+  }
+};
+$("contract-add").onclick = () => {
+  try {
+    const current = document.querySelectorAll(".contract-row").length
+      ? contractInput()
+      : {
+          name: $("contract-name").value,
+          columns: {},
+          allow_extra_columns: $("contract-extra").checked
+        };
+    let name = "column";
+    while (Object.hasOwn(current.columns, name)) name += "_";
+    current.columns = Object.fromEntries([
+      ...Object.entries(current.columns),
+      [name, { type: "string", required: true, nullable: false }]
+    ]);
+    drawContract(current);
+    invalidateContract();
+  } catch (error) {
+    status(error.message, true);
+  }
+};
+$("contract-sample").onclick = () => {
+  loadContract({
+    name: "synthetic-sales-contract",
+    allow_extra_columns: true,
+    columns: {
+      region: {
+        type: "string",
+        required: true,
+        nullable: false,
+        allowed_values: ["North", "South", "East"]
+      },
+      revenue: {
+        type: "number",
+        required: true,
+        nullable: false,
+        min_value: 0,
+        max_value: 500,
+        max_missing_fraction: 0
+      }
+    }
+  });
+  status(
+    "Synthetic sales contract loaded. The synthetic sales table deliberately fails revenue nullability/range/missingness."
+  );
+};
+$("contract-import").onchange = async (event) => {
+  invalidateContract();
+  const generation = revision;
+  try {
+    const text = await readFile(event.target.files[0]);
+    if (revision !== generation) return;
+    loadContract(JSON.parse(text));
+    status("Reusable contract imported. No rows were changed.");
+  } catch (error) {
+    if (revision === generation) status(error.message, true);
+  }
+};
+$("run-contract").onclick = async () => {
+  invalidateContract();
+  const generation = revision;
+  $("run-contract").disabled = true;
+  try {
+    const request = {
+      ...input(),
+      contract: contractInput(),
+      detail_limit: Number($("contract-limit").value)
+    };
+    const result = await analyze(request, "/contracts/validate");
+    if (revision !== generation) return;
+    contractReport = {
+      application: "datapilot",
+      version: "0.4.0",
+      generated_at: new Date().toISOString(),
+      source,
+      input: request,
+      result
+    };
+    const root = $("contract-results"),
+      metrics = el("div", undefined, "metrics");
+    metric(metrics, "Contract result", result.passed ? "PASS" : "FAIL");
+    metric(metrics, "Rule violations", result.violations_total);
+    metric(
+      metrics,
+      "Rows with row-level issues",
+      result.violating_row_count + "/" + result.row_count
+    );
+    metric(metrics, "Global rule violations", result.global_violation_count);
+    root.append(metrics);
+    table(
+      root,
+      ["Rule", "Violation count"],
+      Object.entries(result.rule_violation_counts)
+    );
+    table(
+      root,
+      ["Column", "Row index", "Rule", "Value preview"],
+      result.violations.map((item) => [
+        item.column,
+        item.row_index === null ? "Global" : item.row_index,
+        item.code,
+        item.value_preview ?? JSON.stringify(item)
+      ])
+    );
+    if (result.details_truncated)
+      root.append(
+        el(
+          "p",
+          "Violation detail was truncated; all summary counts are complete.",
+          "notice"
+        )
+      );
+    limitations(root, result.limitations);
+    resultDetails(root, result);
+    status("Contract validation finished. Rule failures do not mutate data.");
+  } catch (error) {
+    if (revision === generation) status(error.message, true);
+  } finally {
+    $("run-contract").disabled = false;
+  }
+};
+$("export-contract").onclick = () => {
+  try {
+    download(
+      "datapilot-contract.json",
+      JSON.stringify(contractInput(), null, 2)
+    );
+  } catch (error) {
+    status(error.message, true);
+  }
+};
+$("export-contract-report").onclick = () => {
+  if (!contractReport) {
+    status("Validate the current table and rules before exporting.", true);
+    return;
+  }
+  download(
+    "datapilot-contract-report.json",
+    JSON.stringify(contractReport, null, 2)
+  );
+};

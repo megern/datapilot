@@ -8,7 +8,7 @@
   </head>
   <body>
     <header>
-      <small>Tabular data profiling · v0.3.0</small>
+      <small>Tabular data profiling · v0.4.0</small>
       <h1>DataPilot</h1>
       <p>
         Turn a CSV into a transparent data-quality report with numeric
@@ -67,6 +67,50 @@
           </div>
         </section>
         <section class="panel wide">
+          <h2>Reusable data contract</h2>
+          <p class="hint">
+            Validate the currently loaded table against explicit rules. Required
+            controls key presence, nullable controls explicit null. No cells are
+            changed.
+          </p>
+          <label
+            >Contract name<input id="contract-name" value="table-contract"
+          /></label>
+          <label class="check"
+            ><input id="contract-extra" type="checkbox" checked />Allow columns
+            outside this contract</label
+          >
+          <div class="actions">
+            <button id="contract-generate">Draft rules from loaded table</button
+            ><button id="contract-add">Add column rule</button
+            ><button id="contract-sample">Load synthetic contract</button>
+          </div>
+          <div id="contract-fields"></div>
+          <label
+            >Import contract JSON<input
+              id="contract-import"
+              type="file"
+              accept=".json,application/json"
+          /></label>
+          <label
+            >Maximum violation details<input
+              id="contract-limit"
+              type="number"
+              value="100"
+              min="1"
+              max="200"
+          /></label>
+          <div class="actions">
+            <button id="run-contract" class="primary">
+              Validate loaded table</button
+            ><button id="export-contract">Export reusable contract</button
+            ><button id="export-contract-report">
+              Export validation report
+            </button>
+          </div>
+          <div id="contract-results"></div>
+        </section>
+        <section class="panel wide">
           <h2>Column statistics and relationships</h2>
           <div id="results" class="empty">
             Numeric summaries, pairwise correlations and outlier row details
@@ -80,6 +124,7 @@
         evidence.
       </footer>
     </main>
+    <script src="/assets/access.js"></script>
     <script type="module" src="/assets/ui.mjs"></script>
   </body>
 </html>

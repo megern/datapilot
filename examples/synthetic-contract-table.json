@@ -1,0 +1,16 @@
+{
+  "rows": [
+    {
+      "region": "North",
+      "revenue": 100
+    },
+    {
+      "region": "West",
+      "revenue": null
+    },
+    {
+      "region": "South",
+      "revenue": 900
+    }
+  ]
+}

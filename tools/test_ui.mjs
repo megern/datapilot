@@ -289,3 +289,109 @@ test("Data quality UI shows typed frequencies and bounded duplicate detail", asy
     delete globalThis.document;
   }
 });
+
+test("Contract UI submits typed reusable rules and renders row/global failures distinctly", async () => {
+  const { readFile: local } = await import("node:fs/promises");
+  const { documentFromHTML } = await import("./ui-test-dom.mjs");
+  globalThis.document = documentFromHTML(
+    await local(new URL("../app/index.html", import.meta.url), "utf8")
+  );
+  await import("../app/static/ui.mjs?feature=contract04");
+  document.getElementById("sample").onclick();
+  document.getElementById("contract-sample").onclick();
+  const original = globalThis.fetch;
+  globalThis.fetch = async (path, options) => {
+    assert.equal(path, "/contracts/validate");
+    const request = JSON.parse(options.body);
+    assert.equal(request.rows.length, 7);
+    assert.equal(request.contract.columns.revenue.type, "number");
+    assert.equal(request.contract.columns.revenue.max_value, 500);
+    assert.equal(request.contract.columns.revenue.nullable, false);
+    return {
+      ok: true,
+      json: async () => ({
+        passed: false,
+        violations_total: 3,
+        violating_row_count: 2,
+        row_count: 7,
+        global_violation_count: 1,
+        rule_violation_counts: {
+          NULL_NOT_ALLOWED: 1,
+          OUT_OF_RANGE: 1,
+          MISSING_FRACTION_EXCEEDED: 1
+        },
+        violations: [
+          {
+            column: "revenue",
+            row_index: null,
+            code: "MISSING_FRACTION_EXCEEDED"
+          }
+        ],
+        details_truncated: false,
+        limitations: ["Rows are unchanged."]
+      })
+    };
+  };
+  try {
+    await document.getElementById("run-contract").onclick();
+    const text = document.getElementById("contract-results").textContent;
+    assert.match(text, /FAIL/);
+    assert.match(text, /Global rule violations/);
+    assert.match(text, /Rows are unchanged/);
+  } finally {
+    globalThis.fetch = original;
+    delete globalThis.document;
+  }
+});
+
+test("Contract editor rejects nonfinite numeric rule text before JSON can turn it into null", async () => {
+  const { readFile: local } = await import("node:fs/promises");
+  const { documentFromHTML } = await import("./ui-test-dom.mjs");
+  globalThis.document = documentFromHTML(
+    await local(new URL("../app/index.html", import.meta.url), "utf8")
+  );
+  await import("../app/static/ui.mjs?feature=contract-finite04");
+  document.getElementById("sample").onclick();
+  document.getElementById("contract-sample").onclick();
+  const field = document.querySelectorAll(".contract-max_value")[1];
+  field.value = "not a number";
+  field.dispatch("input");
+  const original = globalThis.fetch;
+  let fetched = false;
+  globalThis.fetch = async () => {
+    fetched = true;
+    throw Error("must not run");
+  };
+  try {
+    await document.getElementById("run-contract").onclick();
+    assert.equal(fetched, false);
+    assert.match(
+      document.getElementById("status").textContent,
+      /finite number/
+    );
+  } finally {
+    globalThis.fetch = original;
+    delete globalThis.document;
+  }
+});
+
+test("Removing an edited contract row does not depend on its previous column name", async () => {
+  const { readFile: local } = await import("node:fs/promises");
+  const { documentFromHTML } = await import("./ui-test-dom.mjs");
+  globalThis.document = documentFromHTML(
+    await local(new URL("../app/index.html", import.meta.url), "utf8")
+  );
+  await import("../app/static/ui.mjs?feature=contract-remove04");
+  document.getElementById("contract-sample").onclick();
+  const rows = document.querySelectorAll(".contract-row");
+  const field = rows[0].querySelector(".contract-column");
+  field.value = "renamed-column";
+  field.dispatch("input");
+  rows[0].children.find((child) => child.tagName === "button").onclick();
+  assert.equal(document.querySelectorAll(".contract-row").length, 1);
+  assert.equal(
+    document.querySelectorAll(".contract-column")[0].value,
+    "revenue"
+  );
+  delete globalThis.document;
+});
